@@ -30,9 +30,9 @@ public class NoteController {
         return this.noteService.findById(noteId);
     }
 
-    @PostMapping(value = "/{id}")
+    @PostMapping(value = "/{userId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public Note createNote(@PathVariable(name = "id") Integer userId, @RequestBody NoteDTO data) {
+    public Note createNote(@PathVariable(name = "userId") Integer userId, @RequestBody NoteDTO data) {
         return this.noteService.saveUserNote(data, userId);
 
     }
@@ -61,9 +61,21 @@ public class NoteController {
         return this.noteService.findAllLinksByNote(noteId);
     }
 
+    @DeleteMapping("/links")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteNoteLink(@RequestParam Integer linkId) {
+        this.noteService.deleteLinkById(linkId);
+    }
+
     @GetMapping("/tags/{id}")
     @ResponseStatus(HttpStatus.OK)
     public List<Tag> getAllNoteTags(@PathVariable(name = "id") Integer noteId) {
         return this.noteService.findAllTagsByNote(noteId);
+    }
+
+    @DeleteMapping("/tags")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteNoteTag(@RequestParam Integer tagId) {
+        this.noteService.deleteTagById(tagId);
     }
 }

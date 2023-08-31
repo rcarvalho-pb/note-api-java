@@ -141,4 +141,12 @@ public class NoteService {
                 .filter(tag -> tag.getNote().getId() == noteId)
                 .collect(Collectors.toUnmodifiableList());
     }
+
+    public void deleteLinkById(Integer linkId) {
+        this.linkRepository.deleteById(linkId);
+    }
+
+    public void deleteTagById(Integer tagId) {
+        this.tagRepository.deleteById(tagId);
+    }
 }

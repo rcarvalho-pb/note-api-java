@@ -4,6 +4,7 @@ import com.api.note.model.User;
 import com.api.note.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -51,5 +52,11 @@ public class UserController {
         this.userService.delete(id);
     }
 
+    @PostMapping(value = "/avatar/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA})
+    @ResponseStatus(HttpStatus.OK)
+    public User updateAvatar() {
+
+        return new User();
+    }
 
 }
