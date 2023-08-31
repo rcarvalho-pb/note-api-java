@@ -38,25 +38,41 @@ public class NoteService {
     }
 
     public Note findById(Integer id) {
-        return this.noteRepository.findAll().stream()
+        Note res = this.noteRepository.findAll().stream()
                 .filter(note -> note.getId() == id)
                 .findFirst()
                 .orElseThrow(() -> { throw new NotFoundException("Note not found"); });
+        System.out.println(res);
+        return res;
     }
 
     public Note save(Note note) {
         return this.noteRepository.save(note);
     }
 
-    public Note update(Note note, Integer id) {
-        Optional<Note> searchedNote = this.noteRepository.findById(id);
-        searchedNote.ifPresentOrElse(n -> {
-            note.setId(id);
-            this.noteRepository.save(note);
-        }, () -> {
+    public Note update(NoteDTO data, Integer noteId) {
+        Optional<Note> note = this.noteRepository.findById(noteId);
+        if (note.isEmpty() ){
             throw new NotFoundException("Note not found");
-        });
-        return note;
+        }
+
+        List<Link> links = this.linkRepository.findAll().stream()
+                .filter(link -> link.getNote().getId() == noteId)
+                .toList();
+        List<Tag> tags = this.tagRepository.findAll().stream()
+                .filter(tag -> tag.getNote().getId() == noteId)
+                .toList();
+        for(int i = 0; i < links.size(); i++) {
+            links.get(i).setLink(data.links().get(i).getLink());
+        }
+        for (int i = 0; i < tags.size(); i++ ){
+            tags.get(i).setUrl(data.tags().get(i).getUrl());
+        }
+
+        this.linkRepository.saveAll(links);
+        this.tagRepository.saveAll(tags);
+
+        return this.noteRepository.findById(noteId).get();
     }
 
     public void delete(Integer id) {
@@ -82,17 +98,44 @@ public class NoteService {
             throw new NotFoundException("User not found");
         }
         Note note = this.fromDTO(data);
+        System.out.println(note);
         note.setUser(user.get());
         Note savedNote = this.noteRepository.save(note);
+        System.out.println(savedNote);
         List<Link> links = data.links();
         List<Tag> tags = data.tags();
 
         links.forEach(link -> link.setNote(savedNote));
         tags.forEach(tag -> tag.setNote(savedNote));
+        System.out.println(links);
+        System.out.println(tags);
 
         this.linkRepository.saveAll(links);
         this.tagRepository.saveAll(tags);
 
-        return savedNote;
+        Note res = this.findById(savedNote.getId());
+        System.out.println(res);
+        return res;
+
+    }
+
+    public void deleteAllUserNotes(Integer userId) {
+        this.noteRepository.deleteAll(
+                this.noteRepository.findAll().stream()
+                        .filter(note -> note.getUser().getId() == userId)
+                        .toList()
+        );
+    }
+
+    public List<Link> findAllLinksByNote(Integer noteId) {
+        return this.linkRepository.findAll().stream()
+                .filter(link -> link.getNote().getId() == noteId)
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    public List<Tag> findAllTagsByNote(Integer noteId) {
+        return this.tagRepository.findAll().stream()
+                .filter(tag -> tag.getNote().getId() == noteId)
+                .collect(Collectors.toUnmodifiableList());
     }
 }
