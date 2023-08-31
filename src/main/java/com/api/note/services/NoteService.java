@@ -89,7 +89,10 @@ public class NoteService {
     }
 
     public Note fromDTO(NoteDTO data) {
-        return new Note(data.title(), data.description());
+        Note note = new Note(data.title(), data.description());
+        note.setLinks(data.links());
+        note.setTags(data.tags());
+        return note;
     }
 
     public Note saveUserNote(NoteDTO data, Integer userId) {

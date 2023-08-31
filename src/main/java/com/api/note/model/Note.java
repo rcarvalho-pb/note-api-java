@@ -33,14 +33,16 @@ public class Note {
     @OneToMany(
             mappedBy = "note",
             cascade = CascadeType.ALL,
-            orphanRemoval = true
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
     )
     private List<Link> links = new ArrayList<>();
     @JsonManagedReference
     @OneToMany(
             mappedBy = "note",
             cascade = CascadeType.ALL,
-            orphanRemoval = true
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
     )
     private List<Tag> tags = new ArrayList<>();
 
