@@ -1,11 +1,13 @@
 package com.api.note.services;
 
+import com.api.note.config.system.service.DiskStorage;
 import com.api.note.exceptions.DuplicatedException;
 import com.api.note.exceptions.NotFoundException;
 import com.api.note.model.User;
 import com.api.note.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
@@ -59,5 +61,14 @@ public class UserService {
     public void delete(Integer id) {
         Optional<User> user = this.userRepository.findById(id);
         user.ifPresent(this.userRepository::delete);
+    }
+
+    public User updateAvatar(Integer userId, MultipartFile file) {
+      User user = this.findById(userId);
+      if (user == null) throw new NotFoundException("User not found");
+      DiskStorage disk = new DiskStorage();
+      String filename = disk.saveFile(file);
+      user.setAvatar(filename);
+      return this.userRepository.save(user);
     }
 }

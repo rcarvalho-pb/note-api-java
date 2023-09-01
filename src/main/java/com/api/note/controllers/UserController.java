@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -54,9 +55,8 @@ public class UserController {
 
     @PostMapping(value = "/avatar/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @ResponseStatus(HttpStatus.OK)
-    public User updateAvatar() {
-
-        return new User();
+    public User updateAvatar(@PathVariable(name = "userId") Integer userId, @RequestBody MultipartFile file) {
+        return this.userService.updateAvatar(userId, file);
     }
 
 }
