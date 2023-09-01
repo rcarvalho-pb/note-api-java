@@ -52,7 +52,7 @@ public class UserController {
         this.userService.delete(id);
     }
 
-    @PostMapping(value = "/avatar/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA})
+    @PostMapping(value = "/avatar/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @ResponseStatus(HttpStatus.OK)
     public User updateAvatar() {
 
