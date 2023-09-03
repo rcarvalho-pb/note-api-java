@@ -19,12 +19,11 @@ import java.util.UUID;
 @Slf4j
 public class DiskStorage {
 
-    @Value("${data.name}")
-    private String uploadsDir;
+//    @Value("${data.name}")
+    private String uploadsDir = "./src/main/resources/static/images/";
 
 
     public String saveFile(MultipartFile file) {
-        log.info("upload dir = {}",uploadsDir);
         
         if(! file.isEmpty()) {
             String filename = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
@@ -57,8 +56,6 @@ public class DiskStorage {
             Files.delete(Paths.get(uploadsDir, avatar));
             return true;
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
             return false;
         }
     }

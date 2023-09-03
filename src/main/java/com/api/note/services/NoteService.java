@@ -11,6 +11,7 @@ import com.api.note.repositories.NoteRepository;
 import com.api.note.repositories.TagRepository;
 import com.api.note.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NoteService {
 
     private final NoteRepository noteRepository;
@@ -44,10 +46,6 @@ public class NoteService {
                 .orElseThrow(() -> { throw new NotFoundException("Note not found"); });
         System.out.println(res);
         return res;
-    }
-
-    public Note save(Note note) {
-        return this.noteRepository.save(note);
     }
 
     public Note update(NoteDTO data, Integer noteId) {
@@ -100,25 +98,10 @@ public class NoteService {
         if (user.isEmpty()) {
             throw new NotFoundException("User not found");
         }
-        Note note = this.fromDTO(data);
-        System.out.println(note);
+
+        Note note = fromDTO(data);
         note.setUser(user.get());
-        Note savedNote = this.noteRepository.save(note);
-        System.out.println(savedNote);
-        List<Link> links = data.links();
-        List<Tag> tags = data.tags();
-
-        links.forEach(link -> link.setNote(savedNote));
-        tags.forEach(tag -> tag.setNote(savedNote));
-        System.out.println(links);
-        System.out.println(tags);
-
-        this.linkRepository.saveAll(links);
-        this.tagRepository.saveAll(tags);
-
-        Note res = this.findById(savedNote.getId());
-        System.out.println(res);
-        return res;
+        return this.noteRepository.save(note);
 
     }
 

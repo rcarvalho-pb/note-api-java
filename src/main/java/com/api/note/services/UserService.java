@@ -4,8 +4,11 @@ import com.api.note.config.service.DiskStorage;
 import com.api.note.exceptions.DuplicatedException;
 import com.api.note.exceptions.NotFoundException;
 import com.api.note.model.User;
+import com.api.note.model.enums.UserRole;
 import com.api.note.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +24,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder encoder;
 
     public List<User> findAll() {
         return Collections.unmodifiableList(this.userRepository.findAll());
@@ -43,6 +47,7 @@ public class UserService {
     public User create(User user) {
         Optional<User> searchedUser = this.userRepository.findByEmail(user.getEmail());
         if (searchedUser.isEmpty()) {
+            user.setPassword(encoder.encode(user.getPassword()));
             return this.userRepository.save(user);
         }
         throw new DuplicatedException("User already exists");
@@ -55,7 +60,12 @@ public class UserService {
     public User update(User user, Integer id) {
         Optional<User> searchedUser = this.userRepository.findById(id);
         if (searchedUser.isPresent()) {
+            String encodedPassword = encoder.encode(user.getPassword());
             user.setId(id);
+            user.setPassword(encodedPassword);
+            if (searchedUser.get().getRole() != UserRole.ADMIN) {
+                user.setRole(UserRole.USER);
+            }
             return this.userRepository.save(user);
         }
         throw new NotFoundException("User not Found");

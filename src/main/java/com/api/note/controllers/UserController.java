@@ -3,10 +3,14 @@ package com.api.note.controllers;
 import com.api.note.model.User;
 import com.api.note.services.UserService;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,7 +20,7 @@ import java.io.InputStream;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping(value = "users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -28,7 +32,7 @@ public class UserController {
         return this.userService.findAll();
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "{id}")
     @ResponseStatus(HttpStatus.OK)
     public User findById(@PathVariable(value = "id") Integer id) {
         return this.userService.findById(id);
@@ -48,6 +52,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @PreAuthorize("hasRole('USER')")
     public User update(@RequestBody User user, @PathVariable Integer id) {
         return this.userService.update(user, id);
     }
@@ -58,17 +63,6 @@ public class UserController {
         this.userService.delete(id);
     }
 
-    @PostMapping(value = "/avatar/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    @ResponseStatus(HttpStatus.OK)
-    public User updateAvatar(@PathVariable(name = "userId") Integer userId, @RequestBody MultipartFile file) throws IOException {
-        return this.userService.updateAvatar(userId, file);
-    }
 
-    @PostMapping(value = "/avatar/{filename}", produces = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public void getAvatar(@PathVariable String filename, HttpServletResponse response) throws IOException {
-        InputStream file = this.userService.getAvatar(filename);
-        response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-        StreamUtils.copy(file, response.getOutputStream());
-    }
 
 }

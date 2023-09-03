@@ -33,6 +33,7 @@ public class NoteController {
     @PostMapping(value = "/{userId}")
     @ResponseStatus(HttpStatus.CREATED)
     public Note createNote(@PathVariable(name = "userId") Integer userId, @RequestBody NoteDTO data) {
+        System.out.println("NoteController - Criando Nota");
         return this.noteService.saveUserNote(data, userId);
 
     }
@@ -57,7 +58,7 @@ public class NoteController {
 
     @GetMapping("/links")
     @ResponseStatus(HttpStatus.OK)
-    public List<Link> getAllNoteLinks(@PathVariable Integer noteId) {
+    public List<Link> getAllNoteLinks(@RequestParam Integer noteId) {
         return this.noteService.findAllLinksByNote(noteId);
     }
 
@@ -69,7 +70,7 @@ public class NoteController {
 
     @GetMapping("/tags/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public List<Tag> getAllNoteTags(@PathVariable(name = "id") Integer noteId) {
+    public List<Tag> getAllNoteTags(@RequestParam Integer noteId) {
         return this.noteService.findAllTagsByNote(noteId);
     }
 
